@@ -1,0 +1,45 @@
+
+
+```{r}
+#> install.packages("fivethirtyeight")
+#> install.packages("tidyverse")
+#> install.packages("googleway")
+#> install.packages("leaflet")
+
+library(fivethirtyeight)
+library(tidyverse)
+library(googleway)
+library(leaflet)
+
+## using a valid Google Maps API key
+## this key was made using my personal google account: trevorptracy@gmail.com
+key <- "AIzaSyDea9BHdMYeXvLUjJObACk2Ox8ofse2m68"
+
+## Using the first and last coordinates as the origin/destination
+origin <- c(17.48693, 78.38945)
+destination <- c(17.47077, 78.35874)
+
+## and the coordinates in between as waypoints
+waypoints <- list(via = c(17.49222, 78.39643),
+                  via = c(17.51965, 78.37835),
+                  via = c(17.49359, 78.40079),
+                  via = c(17.49284, 78.40686))
+## use 'stop' in place of 'via' for stopovers
+
+## get the directions from Google Maps API
+res <- google_directions(origin = origin,
+                         destination = destination,
+                         waypoints = waypoints,
+                         key = key)  ## include simplify = F to return data as JSON
+
+res
+
+df_polyline <- decode_pl(res$routes$overview_polyline$points)
+head(df_polyline)
+
+leaflet() %>%
+  addTiles() %>%
+  addPolylines(data = df_polyline, lat = ~lat, lng = ~lon)
+```
+
+
