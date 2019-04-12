@@ -1,4 +1,15 @@
+#### Project: MinneMap
+##### Class: Stat 360
+##### Date Due: 
+##### Created By: 
+##### Project Description: 
 
+```{r}
+# Setting up git in the Terminal:
+#git config --global user.name 'Jane Doe'
+#git config --global user.email 'jane@example.com'
+#git config credential.helper 'cache 7200'
+```
 
 ```{r}
 #> install.packages("fivethirtyeight")
@@ -32,10 +43,10 @@ res <- google_directions(origin = origin,
                          waypoints = waypoints,
                          key = key)  ## include simplify = F to return data as JSON
 
-res
+#res
 
 df_polyline <- decode_pl(res$routes$overview_polyline$points)
-head(df_polyline)
+#head(df_polyline)
 
 leaflet() %>%
   addTiles() %>%
