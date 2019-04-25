@@ -54,3 +54,72 @@ leaflet() %>%
 ```
 
 
+```{r}
+## 2nd example of googleway with MN locations
+
+library(googleway)
+
+## using a valid Google Maps API key
+key <- "AIzaSyDea9BHdMYeXvLUjJObACk2Ox8ofse2m68"
+
+## Using the first and last coordinates as the origin/destination
+origin <- c(44.952180, -93.182773)
+destination <- c(44.886176, -93.247371)
+
+## and the coordinates in between as waypoints
+waypoints <- list(via = c(44.945816, -93.298559))#,
+#                  via = c(17.51965, 78.37835),
+#                  via = c(17.49359, 78.40079),
+#                  via = c(17.49284, 78.40686))
+## use 'stop' in place of 'via' for stopovers
+
+## get the directions from Google Maps API
+res <- google_directions(origin = origin,
+                         destination = destination,
+                         waypoints = waypoints,
+                         key = key)  ## include simplify = F to return data as JSON
+
+#############################################################
+## This section gets the distance and duration of the #######
+## trip based on the 'res' result of 'google_directions()'
+stored_frame <- data.frame(res$routes$legs)
+stored_frame$distance
+stored_frame$duration
+## We may be able to use this to pick the best new transit
+## system because the shortest travel time/distance will
+## likely be the cheapest to produce for any given set of
+## locations.
+##
+## Algorithmically, given a set of n locations, the
+## number of potential solutions would be n!.
+## This means 10 locations will involves calculating
+## 3,628,800 routes and choosing the shortest. It is likely
+## that is is too many calculations and we will have to be
+## smarter with how to determine waypoint order.
+##
+## E.g. we could make the origin and destination be the
+## coordinates that are the furthest from each other. From
+## there, take either coordinate and find the next closest.
+## etc, etc, etc.
+#############################################################
+
+df_polyline <- decode_pl(res$routes$overview_polyline$points)
+#df_polyline
+
+library(leaflet)
+
+leaflet() %>%
+  addTiles() %>%
+  addPolylines(data = df_polyline, lat = ~lat, lng = ~lon)
+```
+
+```{r}
+# Documentation: https://rdrr.io/cran/googleway/man/google_directions.html
+
+
+
+```
+
+
+
+
