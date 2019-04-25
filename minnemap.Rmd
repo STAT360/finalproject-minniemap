@@ -79,10 +79,20 @@ res <- google_directions(origin = origin,
                          waypoints = waypoints,
                          key = key)  ## include simplify = F to return data as JSON
 
+green_line <- google_directions(origin = "Union Depot, Minnesota",
+                              destination = "Target Field, Minnesota",
+                              key = key,
+                              mode = 'transit')
+
+blue_line <- google_directions(origin = "Target Field, Minnesota",
+                              destination = "Mall of America, Minnesota",
+                              key = key,
+                              mode = 'transit')
+
 #############################################################
 ## This section gets the distance and duration of the #######
 ## trip based on the 'res' result of 'google_directions()'
-stored_frame <- data.frame(res$routes$legs)
+stored_frame <- data.frame(green_line$routes$legs)
 stored_frame$distance
 stored_frame$duration
 ## We may be able to use this to pick the best new transit
@@ -103,14 +113,18 @@ stored_frame$duration
 ## etc, etc, etc.
 #############################################################
 
-df_polyline <- decode_pl(res$routes$overview_polyline$points)
+df_polyline1 <- decode_pl(res$routes$overview_polyline$points)
+df_polyline_greenline <- decode_pl(green_line$routes$overview_polyline$points)
+df_polyline_blueline <- decode_pl(blue_line$routes$overview_polyline$points)
 #df_polyline
 
 library(leaflet)
 
 leaflet() %>%
   addTiles() %>%
-  addPolylines(data = df_polyline, lat = ~lat, lng = ~lon)
+  addPolylines(data = df_polyline1, lat = ~lat, lng = ~lon, color = "yellow") %>%
+  addPolylines(data = df_polyline_greenline, lat = ~lat, lng = ~lon, color = "green") %>%
+  addPolylines(data = df_polyline_blueline, lat = ~lat, lng = ~lon, color = "blue")
 ```
 
 ```{r}
