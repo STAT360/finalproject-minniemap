@@ -50,7 +50,8 @@ df_polyline <- decode_pl(res$routes$overview_polyline$points)
 
 leaflet() %>%
   addTiles() %>%
-  addPolylines(data = df_polyline, lat = ~lat, lng = ~lon)
+  ##addPolylines(data = df_polyline, lat = ~lat, lng = ~lon)
+  addMarkers(data = McData, lat = ~lat, lng = ~lng)
 ```
 
 
@@ -133,7 +134,14 @@ leaflet() %>%
 
 
 ```
+```{r}
+Mcdicks_2 <- google_places(search_string = "McDonalds", location = c(44.97566,-93.2696761), radius = 24140, key = c("AIzaSyDea9BHdMYeXvLUjJObACk2Ox8ofse2m68"), page_token = Mcdicks$next_page_token)
 
+McData2<-Mcdicks_2$results[2]$geometry$location
 
+McData<- bind_rows(Mcdata,McData2)
+McData<- bind_rows(McData,McData2)
+McData
+```
 
 
