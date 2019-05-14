@@ -15,6 +15,7 @@ library(shinydashboard)
 library(shinyalert)
 library(leaflet)
 library(googleway)
+library(tidyr)
 ```
 
 The first draft of the app. The layout and overall appearance I think is pretty close to the final version. It will need adjustments when the rest of the code is finalized.
@@ -26,32 +27,55 @@ Functionality-wise, the only functional control widgets are the 'show existing m
 ```{r}
 key <- "AIzaSyDea9BHdMYeXvLUjJObACk2Ox8ofse2m68"
 
-origin <- c(44.952180, -93.182773)
-destination <- c(44.886176, -93.247371)
-
-waypoints <- list(via = c(17.49222, 78.39643),
-                  via = c(17.51965, 78.37835),
-                  via = c(17.49359, 78.40079),
-                  via = c(17.49284, 78.40686))
-
-yellow_line <- google_directions(origin = origin,
-                         destination = destination,
-                         waypoints = waypoints,
-                         key = key)
-
-green_line <- google_directions(origin = "Union Depot, Minnesota",
-                              destination = "Target Field, Minnesota",
+green_line <- google_directions(origin = "Union Depot Station, Minnesota",
+                              destination = "Target Field Station, Minnesota",
                               key = key,
                               mode = 'transit')
 
-blue_line <- google_directions(origin = "Target Field, Minnesota",
-                              destination = "Mall of America, Minnesota",
+blue_line <- google_directions(origin = "Target Field Station, Minnesota",
+                              destination = "Mall of America Station, Minnesota",
                               key = key,
                               mode = 'transit')
 
-df_polyline_yellowline <- decode_pl(yellow_line$routes$overview_polyline$points)
-df_polyline_greenline <- decode_pl(green_line$routes$overview_polyline$points)
-df_polyline_blueline <- decode_pl(blue_line$routes$overview_polyline$points)
+a_line <- google_directions(origin = "Rosedale Transit Center, Minnesota",
+                              destination = "46th St Station, Minnesota",
+                              key = key,
+                              mode = 'transit')
+
+red_line <- google_directions(origin = "Mall of America Center, Minnesota",
+                              destination = "Apple Valley Transit Station, Minnesota",
+                              key = key,
+                              mode = 'transit')
+
+route_5 <- google_directions(origin = "Brooklyn Center Transit, Minnesota",
+                             destination = "Mall of America Transit Station, Minnesota",
+                             key = key,
+                             mode = 'transit')
+
+route_21 <- google_directions(origin = "Uptown Transit Station, Minnesota",
+                             destination = "Snelling Ave Station, Minnesota",
+                             key = key,
+                             mode = 'transit')
+
+route_18 <- google_directions(origin = "4th Ave S - 3rd St S, Minneapolis, MN 55415",
+                             destination = "9830 Aldrich Ave S, Bloomington, MN 55420",
+                             key = key,
+                             mode = 'transit')
+
+route_6 <- google_directions(origin = "Stadium Village Station, Minnesota",
+                             destination = "Southdale Transit Center, Minnesota",
+                             key = key,
+                             mode = 'transit')
+
+greenline <- decode_pl(green_line$routes$overview_polyline$points)
+blueline <- decode_pl(blue_line$routes$overview_polyline$points)
+aline <- decode_pl(a_line$routes$overview_polyline$points)
+redline <- decode_pl(red_line$routes$overview_polyline$points)
+route5 <- decode_pl(route_5$routes$overview_polyline$points)
+route21 <- decode_pl(route_21$routes$overview_polyline$points)
+route18 <- decode_pl(route_18$routes$overview_polyline$points)
+route6 <- decode_pl(route_6$routes$overview_polyline$points)
+
 
 ui <- dashboardPage(
   
@@ -72,14 +96,11 @@ ui <- dashboardPage(
       column(width = 9,
              
              tags$style(type = "text/css", "#map {height: calc(100vh - 80px) !important;},"),
-             
              leafletOutput("map")),
       
       column(width = 3,
              
-             titlePanel(span("Create a map", style = "font-family: 'Avenir Next' !important;",br())),
-            # helpText("What if all bus stops in the Twin Cities area were at McDonald's? Gas stations? Build a
-                     # transit map using the options below.",br(),br()),
+             titlePanel(span("Create a map", br())),
              helpText("Choose a category and search for locations. This search uses Google Maps."),
              textInput("text", "Type your selection:"),
              actionButton("submittext", label = "Search"),
@@ -88,13 +109,12 @@ ui <- dashboardPage(
              selectInput("hubs", "Number of hubs:", choices = c(1,2,3,4)),
              helpText("Set the number of different routes."),
              sliderInput("routes", "Number of routes:", min = 3, max = 10, value = 3),
-             checkboxInput("mtroutes", "Show existing Metro Transit routes", TRUE),
+             checkboxInput("mtroutes", "Show existing Metro Transit routes", FALSE),
              actionButton("centermap", "Recenter map"))
+      
    )
  ),
- 
  useShinyalert(),
- 
 )
 
 
@@ -105,38 +125,45 @@ server <- function(input, output) {
   "What if all bus stops in the Twin Cities area were at McDonald's? Gas stations?
   
   Build a transit map for the Twin Cities area by choosing what locations to use for the stops. Customize the map by changing the number of central transit hubs and the number of routes.")
-  
   output$map <- renderLeaflet({
     leaflet() %>% 
       addTiles() %>%
-      setView(lng = -93.2, lat = 44.95, zoom = 11) 
+      setView(lng = -93.2696761, lat = 44.97566, zoom = 11.45) 
   })
-  
   selectedPoints <- reactive({
     #finalized google search and data extraction of long & lat values
   })
   
   observe({
-    
     if (input$mtroutes) {
       leafletProxy("map") %>% 
         addTiles() %>%
-        addPolylines(data = df_polyline_yellowline, lat = ~lat, lng = ~lon, color = "yellow") %>%
-        addPolylines(data = df_polyline_greenline, lat = ~lat, lng = ~lon, color = "green") %>%
-        addPolylines(data = df_polyline_blueline, lat = ~lat, lng = ~lon, color = "blue")
+        addPolylines(data = greenline, lat = ~lat, lng = ~lon, color = "black", layerId = "greenline") %>%
+        addPolylines(data = blueline, lat = ~lat, lng = ~lon, color = "black", layerId = "blueline") %>% 
+        addPolylines(data = aline, lat = ~lat, lng = ~lon, color = "black", layerId = "aline") %>% 
+        addPolylines(data = redline, lat = ~lat, lng = ~lon, color = "black", layerId = "redline") %>% 
+        addPolylines(data = route5, lat = ~lat, lng = ~lon, color = "black", layerId = "route5") %>% 
+        addPolylines(data = route21, lat = ~lat, lng = ~lon, color = "black", layerId = "route21") %>% 
+        addPolylines(data = route18, lat = ~lat, lng = ~lon, color = "black", layerId = "route18") %>% 
+        addPolylines(data = route6, lat = ~lat, lng = ~lon, color = "black", layerId = "route6")
     } 
-    
     else {
-      leafletProxy("map") %>% 
-        clearShapes()
+      proxy <- leafletProxy("map")
+      removeShape(proxy, layerId = "greenline")
+      removeShape(proxy, layerId = "blueline") 
+      removeShape(proxy, layerId = "aline")
+      removeShape(proxy, layerId = "redline")
+      removeShape(proxy, layerId = "route5")
+      removeShape(proxy, layerId = "route21")
+      removeShape(proxy, layerId = "route18")
+      removeShape(proxy, layerId = "route6")
     }
   })
   
   observe({
-    
     if (input$centermap) {
       leafletProxy("map") %>% 
-        setView(lng = -93.2, lat = 44.95, zoom = 11) 
+        setView(lng = -93.2696761, lat = 44.97566, zoom = 11.45) 
     }
   })
   
@@ -144,3 +171,6 @@ server <- function(input, output) {
 
 shinyApp(ui, server)
 ```
+
+git config --global user.email "nels6906@stthomas.edu"
+git config --global user.name "Ryan Nelson"
