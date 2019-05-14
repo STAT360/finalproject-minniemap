@@ -145,23 +145,50 @@ filtered_points %>%
 
 ```{r}
 ##Create sub-clusters
-sub_clust <- kmeans(filtered_points, centers = 8)
+sub_clust <- kmeans(filtered_points_90, centers = 8)
 
 as.data.frame(sub_clust$centers) %>% 
   leaflet() %>%
     addTiles() %>%
-    addMarkers(lat = ~lat, lng = ~lng -90)
+    addMarkers(lat = ~lat, lng = ~lng)
 
 ##Create center of sub-cluster
-cent_sub_clust <- kmeans(sub_clust$centers, centers = 2)
+cent_sub_clust <- kmeans(sub_clust$centers, centers = 1)
 
 as.data.frame(cent_sub_clust$centers) %>% 
   leaflet() %>%
     addTiles() %>%
-    addMarkers(lat = ~lat, lng = ~lng -90)
+    addMarkers(lat = ~lat, lng = ~lng)
 ```
-
-
+```{r}
+##Waypoint calculation
+i<-1
+df_polyline<-NULL
+for(i in 1:8){
+  
+  origin<- sub_clust$centers[i,]
+  destination<- as.numeric(cent_sub_clust$centers)
+##waypoints<-
+  
+  test.waypoints <- google_directions(origin = origin,
+                          destination = destination,
+                          ##waypoints = waypoints,
+                          key = key)
+  df_polyline <- decode_pl(test.waypoints$routes$overview_polyline$points)
+  if(i == 1){
+    full_way <- df_polyline
+  }
+  else{
+    full_way <- cbind(full_way, df_polyline)
+    }
+}
+```
+```{r}
+df_polyline[] %>% 
+  leaflet() %>%
+    addTiles() %>%
+    addPolylines(lat = ~lat, lng = ~lon, color = "cyan")
+```
 
 
 
