@@ -12,10 +12,11 @@
 ```
 
 ```{r}
-#> install.packages("fivethirtyeight")
-#> install.packages("tidyverse")
-#> install.packages("googleway")
-#> install.packages("leaflet")
+# install.packages("fivethirtyeight")
+# install.packages("tidyverse")
+# install.packages("googleway")
+# install.packages("leaflet")
+# install.packages("geosphere")
 
 library(fivethirtyeight)
 library(tidyverse)
@@ -162,7 +163,12 @@ as.data.frame(cent_sub_clust$centers) %>%
 ```
 
 
+```{r}
 
+
+
+
+```
 
 
 
