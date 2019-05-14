@@ -1,0 +1,80 @@
+---
+title: "K-Means"
+author: "JK"
+date: "5/9/2019"
+output: html_document
+---
+
+
+K-Means clustering makes clusters based on minimizing intra-cluster variation
+
+standard algorithm defines the total within-cluster variation as the sum of squared distances Euclidean distances between items and the corresponding centroid:
+
+W(Ck)=∑xi∈Ck(xi−μk)2
+
+where:
+
+xi is a data point belonging to the cluster Ck
+μk is the mean value of the points assigned to the cluster Ck
+
+
+1. Specify k - the number of clusters to be created.
+
+2. Select randomly k objects from the dataset as the initial cluster centers.
+
+3. Assign each observation to their closest centroid, based on the Euclidean distance    between the object and the centroid.
+
+4. For each of the k clusters recompute the cluster centroid by calculating the new     mean value of all the data points in the cluster.
+
+5. Iteratively minimize the total within sum of square. Repeat Step 3 and Step 4,       until the centroids do not change or the maximum number of iterations is reached     (R uses 10 as the default value for the maximum number of iterations).
+
+kmeans(x=dataframe, centers = # of clusters)
+
+
+```{r}
+
+Lat <- c(40.1, 40.2, 40.3, 40.4, 40.5, 41.1, 41.2, 41.3, 41.4, 41.5, 45.1, 45.2, 45.3, 45.4)
+Lon <- c(-70.1, -70.2, -70.3, -70.4, -70.5, -71.1, -71.2, -71.3, -71.4, -71.5, -75.1, -75.2, -75.3, -75.4)
+df1 <- cbind(Lat, Lon)
+df1
+```
+
+
+```{r}
+
+Map_clusters <- function(df, main_clusters, sub_clusters){
+
+    clers <- kmeans(df, main_clusters)
+      df2 <- cbind(df[,1], df[,2], clers$cluster)
+      
+      
+  sub_clers <- vector("logical", length =100)
+  
+  for(i in 1:sub_clusters){
+    
+    sub_df <- subset(df2, df2[,3] == i)
+    
+      sub_clers[i] <- kmeans(sub_df[i], sub_clusters)
+      
+      
+      df3[i] <- cbind(sub_df[,1][i], sub_df[,2][i], sub_df[,3][i], sub_clers$clusters[i])
+      
+    }
+  
+      
+  df4 <- data.frame(df3)
+  
+
+  print(df4)
+}
+
+Map_clusters(df1, 3, 3)
+
+```
+
+
+
+
+
+
+
