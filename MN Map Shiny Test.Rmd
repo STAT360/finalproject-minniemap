@@ -67,14 +67,14 @@ route_6 <- google_directions(origin = "Stadium Village Station, Minnesota",
                              key = key,
                              mode = 'transit')
 
-df_polyline_greenline <- decode_pl(green_line$routes$overview_polyline$points)
-df_polyline_blueline <- decode_pl(blue_line$routes$overview_polyline$points)
-df_polyline_aline <- decode_pl(a_line$routes$overview_polyline$points)
-df_polyline_redline <- decode_pl(red_line$routes$overview_polyline$points)
-df_polyline_route5 <- decode_pl(route_5$routes$overview_polyline$points)
-df_polyline_route21 <- decode_pl(route_21$routes$overview_polyline$points)
-df_polyline_route18 <- decode_pl(route_18$routes$overview_polyline$points)
-df_polyline_route6 <- decode_pl(route_6$routes$overview_polyline$points)
+greenline <- decode_pl(green_line$routes$overview_polyline$points)
+blueline <- decode_pl(blue_line$routes$overview_polyline$points)
+aline <- decode_pl(a_line$routes$overview_polyline$points)
+redline <- decode_pl(red_line$routes$overview_polyline$points)
+route5 <- decode_pl(route_5$routes$overview_polyline$points)
+route21 <- decode_pl(route_21$routes$overview_polyline$points)
+route18 <- decode_pl(route_18$routes$overview_polyline$points)
+route6 <- decode_pl(route_6$routes$overview_polyline$points)
 
 
 ui <- dashboardPage(
@@ -138,14 +138,14 @@ server <- function(input, output) {
     if (input$mtroutes) {
       leafletProxy("map") %>% 
         addTiles() %>%
-        addPolylines(data = df_polyline_greenline, lat = ~lat, lng = ~lon, color = "black", layerId = "greenline") %>%
-        addPolylines(data = df_polyline_blueline, lat = ~lat, lng = ~lon, color = "black", layerId = "blueline") %>% 
-        addPolylines(data = df_polyline_aline, lat = ~lat, lng = ~lon, color = "black", layerId = "aline") %>% 
-        addPolylines(data = df_polyline_redline, lat = ~lat, lng = ~lon, color = "black", layerId = "redline") %>% 
-        addPolylines(data = df_polyline_route5, lat = ~lat, lng = ~lon, color = "black", layerId = "5line") %>% 
-        addPolylines(data = df_polyline_route21, lat = ~lat, lng = ~lon, color = "black", layerId = "21line") %>% 
-        addPolylines(data = df_polyline_route18, lat = ~lat, lng = ~lon, color = "black", layerId = "18line") %>% 
-        addPolylines(data = df_polyline_route6, lat = ~lat, lng = ~lon, color = "black", layerId = "6line")
+        addPolylines(data = greenline, lat = ~lat, lng = ~lon, color = "black", layerId = "greenline") %>%
+        addPolylines(data = blueline, lat = ~lat, lng = ~lon, color = "black", layerId = "blueline") %>% 
+        addPolylines(data = aline, lat = ~lat, lng = ~lon, color = "black", layerId = "aline") %>% 
+        addPolylines(data = redline, lat = ~lat, lng = ~lon, color = "black", layerId = "redline") %>% 
+        addPolylines(data = route5, lat = ~lat, lng = ~lon, color = "black", layerId = "route5") %>% 
+        addPolylines(data = route21, lat = ~lat, lng = ~lon, color = "black", layerId = "route21") %>% 
+        addPolylines(data = route18, lat = ~lat, lng = ~lon, color = "black", layerId = "route18") %>% 
+        addPolylines(data = route6, lat = ~lat, lng = ~lon, color = "black", layerId = "route6")
     } 
     else {
       proxy <- leafletProxy("map")
@@ -153,10 +153,10 @@ server <- function(input, output) {
       removeShape(proxy, layerId = "blueline") 
       removeShape(proxy, layerId = "aline")
       removeShape(proxy, layerId = "redline")
-      removeShape(proxy, layerId = "5line")
-      removeShape(proxy, layerId = "21line")
-      removeShape(proxy, layerId = "18line")
-      removeShape(proxy, layerId = "6line")
+      removeShape(proxy, layerId = "route5")
+      removeShape(proxy, layerId = "route21")
+      removeShape(proxy, layerId = "route18")
+      removeShape(proxy, layerId = "route6")
     }
   })
   
@@ -171,3 +171,6 @@ server <- function(input, output) {
 
 shinyApp(ui, server)
 ```
+
+git config --global user.email "nels6906@stthomas.edu"
+git config --global user.name "Ryan Nelson"
