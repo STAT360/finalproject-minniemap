@@ -30,6 +30,12 @@ xi is a data point belonging to the cluster Ck
 
 kmeans(x=dataframe, centers = # of clusters)
 
+```{r}
+library(tidyverse)
+
+
+```
+
 
 ```{r}
 
@@ -39,6 +45,19 @@ df1 <- cbind(Lat, Lon)
 df1
 ```
 
+```{r}
+Map_clusters_1 <- function(df, tot_clusters, hub_clusters){
+  
+  tot_clers <- kmeans(df, tot_clusters)
+    df2 <-
+  
+  
+  
+}
+
+
+```
+
 
 ```{r}
 
@@ -46,29 +65,31 @@ Map_clusters <- function(df, main_clusters, sub_clusters){
 
     clers <- kmeans(df, main_clusters)
       df2 <- cbind(df[,1], df[,2], clers$cluster)
-      
-      
-  sub_clers <- vector("logical", length =100)
   
   for(i in 1:sub_clusters){
     
     sub_df <- subset(df2, df2[,3] == i)
+      sub_df12 <- cbind(sub_df[,1], sub_df[,2])
     
-      sub_clers[i] <- kmeans(sub_df[i], sub_clusters)
+      sub_clers <- kmeans(sub_df12, sub_clusters)
       
       
-      df3[i] <- cbind(sub_df[,1][i], sub_df[,2][i], sub_df[,3][i], sub_clers$clusters[i])
+      df3 <- cbind(sub_df12[,1], sub_df12[,2], sub_df[,3], sub_clers$clusters)
+      
+      if(i==1){
+        df4 <- df3
+      } else {
+          df4 <- bind_rows(df4, df3)
+          }
       
     }
   
-      
-  df4 <- data.frame(df3)
-  
-
-  print(df4)
+  return(df3)
 }
 
-Map_clusters(df1, 3, 3)
+
+
+Map_clusters(df1, 3, 2)
 
 ```
 
