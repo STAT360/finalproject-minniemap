@@ -15,6 +15,7 @@ library(shinydashboard)
 library(shinyalert)
 library(leaflet)
 library(googleway)
+library(tidyr)
 ```
 
 The first draft of the app. The layout and overall appearance I think is pretty close to the final version. It will need adjustments when the rest of the code is finalized.
@@ -29,10 +30,7 @@ key <- "AIzaSyDea9BHdMYeXvLUjJObACk2Ox8ofse2m68"
 origin <- c(44.952180, -93.182773)
 destination <- c(44.886176, -93.247371)
 
-waypoints <- list(via = c(17.49222, 78.39643),
-                  via = c(17.51965, 78.37835),
-                  via = c(17.49359, 78.40079),
-                  via = c(17.49284, 78.40686))
+waypoints <- list(via = c(44.945816, -93.298559))
 
 yellow_line <- google_directions(origin = origin,
                          destination = destination,
