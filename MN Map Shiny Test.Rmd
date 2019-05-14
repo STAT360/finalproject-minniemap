@@ -37,13 +37,13 @@ yellow_line <- google_directions(origin = origin,
                          waypoints = waypoints,
                          key = key)
 
-green_line <- google_directions(origin = "Union Depot, Minnesota",
-                              destination = "Target Field, Minnesota",
+green_line <- google_directions(origin = "Union Depot Station, Minnesota",
+                              destination = "Target Field Station, Minnesota",
                               key = key,
                               mode = 'transit')
 
-blue_line <- google_directions(origin = "Target Field, Minnesota",
-                              destination = "Mall of America, Minnesota",
+blue_line <- google_directions(origin = "Target Field Station, Minnesota",
+                              destination = "Mall of America Station, Minnesota",
                               key = key,
                               mode = 'transit')
 
@@ -75,7 +75,7 @@ ui <- dashboardPage(
       
       column(width = 3,
              
-             titlePanel(span("Create a map", style = "font-family: 'Avenir Next' !important;",br())),
+             titlePanel(span("Create a map", br())),
             # helpText("What if all bus stops in the Twin Cities area were at McDonald's? Gas stations? Build a
                      # transit map using the options below.",br(),br()),
              helpText("Choose a category and search for locations. This search uses Google Maps."),
@@ -119,14 +119,16 @@ server <- function(input, output) {
     if (input$mtroutes) {
       leafletProxy("map") %>% 
         addTiles() %>%
-        addPolylines(data = df_polyline_yellowline, lat = ~lat, lng = ~lon, color = "yellow") %>%
-        addPolylines(data = df_polyline_greenline, lat = ~lat, lng = ~lon, color = "green") %>%
-        addPolylines(data = df_polyline_blueline, lat = ~lat, lng = ~lon, color = "blue")
+        addPolylines(data = df_polyline_yellowline, lat = ~lat, lng = ~lon, color = "yellow", layerId = "yellowline") %>%
+        addPolylines(data = df_polyline_greenline, lat = ~lat, lng = ~lon, color = "green", layerId = "greenline") %>%
+        addPolylines(data = df_polyline_blueline, lat = ~lat, lng = ~lon, color = "blue", layerId = "blueline")
     } 
     
     else {
-      leafletProxy("map") %>% 
-        clearShapes()
+      proxy <- leafletProxy("map")
+      removeShape(proxy, layerId = "yellowline")
+      removeShape(proxy, layerId = "greenline")
+      removeShape(proxy, layerId = "blueline")      
     }
   })
   
