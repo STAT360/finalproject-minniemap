@@ -1,0 +1,146 @@
+---
+title: "MN Map Shiny TEST"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load libraries used in the app and the other code. The app uses the shinydashboard package rather than regular shiny - it has a cleaner default look and it's easier to customize the layout. 
+
+```{r}
+library(shiny)
+library(shinydashboard)
+library(shinyalert)
+library(leaflet)
+library(googleway)
+```
+
+The first draft of the app. The layout and overall appearance I think is pretty close to the final version. It will need adjustments when the rest of the code is finalized.
+
+Functionality-wise, the only functional control widgets are the 'show existing metro transit' checkbox and the 'recenter map' button. The other widgets will be easy enought to add once we finalize the rest of the code.
+
+**It is a little slow and clunky for the app to start up. This is because the code that it runs beforehand takes a minute. I wanted to use what we had so far to make sure the reactivity in the leaflet would work how I wanted it to.
+
+```{r}
+key <- "AIzaSyDea9BHdMYeXvLUjJObACk2Ox8ofse2m68"
+
+origin <- c(44.952180, -93.182773)
+destination <- c(44.886176, -93.247371)
+
+waypoints <- list(via = c(17.49222, 78.39643),
+                  via = c(17.51965, 78.37835),
+                  via = c(17.49359, 78.40079),
+                  via = c(17.49284, 78.40686))
+
+yellow_line <- google_directions(origin = origin,
+                         destination = destination,
+                         waypoints = waypoints,
+                         key = key)
+
+green_line <- google_directions(origin = "Union Depot, Minnesota",
+                              destination = "Target Field, Minnesota",
+                              key = key,
+                              mode = 'transit')
+
+blue_line <- google_directions(origin = "Target Field, Minnesota",
+                              destination = "Mall of America, Minnesota",
+                              key = key,
+                              mode = 'transit')
+
+df_polyline_yellowline <- decode_pl(yellow_line$routes$overview_polyline$points)
+df_polyline_greenline <- decode_pl(green_line$routes$overview_polyline$points)
+df_polyline_blueline <- decode_pl(blue_line$routes$overview_polyline$points)
+
+ui <- dashboardPage(
+  
+  dashboardHeader(title = span("Minnie Map",
+                               style = "
+                                    font-family: 'Avenir Next' !important; 
+                                    font-weight: bold;
+                                    font-size: 28px;
+                                    color: white;
+                                    background-color: rgba(58,128,167)")),
+  
+  dashboardSidebar(collapsed = TRUE),
+  
+  dashboardBody(
+    
+    fluidRow(
+      
+      column(width = 9,
+             
+             tags$style(type = "text/css", "#map {height: calc(100vh - 80px) !important;},"),
+             
+             leafletOutput("map")),
+      
+      column(width = 3,
+             
+             titlePanel(span("Create a map", style = "font-family: 'Avenir Next' !important;",br())),
+            # helpText("What if all bus stops in the Twin Cities area were at McDonald's? Gas stations? Build a
+                     # transit map using the options below.",br(),br()),
+             helpText("Choose a category and search for locations. This search uses Google Maps."),
+             textInput("text", "Type your selection:"),
+             actionButton("submittext", label = "Search"),
+             helpText(br(),"Set the number of central transit hubs. This will change where routes join
+                      together."),
+             selectInput("hubs", "Number of hubs:", choices = c(1,2,3,4)),
+             helpText("Set the number of different routes."),
+             sliderInput("routes", "Number of routes:", min = 3, max = 10, value = 3),
+             checkboxInput("mtroutes", "Show existing Metro Transit routes", TRUE),
+             actionButton("centermap", "Recenter map"))
+   )
+ ),
+ 
+ useShinyalert(),
+ 
+)
+
+
+server <- function(input, output) {
+  
+  shinyalert("Welcome to Minnie Map",
+  
+  "What if all bus stops in the Twin Cities area were at McDonald's? Gas stations?
+  
+  Build a transit map for the Twin Cities area by choosing what locations to use for the stops. Customize the map by changing the number of central transit hubs and the number of routes.")
+  
+  output$map <- renderLeaflet({
+    leaflet() %>% 
+      addTiles() %>%
+      setView(lng = -93.2, lat = 44.95, zoom = 11) 
+  })
+  
+  selectedPoints <- reactive({
+    #finalized google search and data extraction of long & lat values
+  })
+  
+  observe({
+    
+    if (input$mtroutes) {
+      leafletProxy("map") %>% 
+        addTiles() %>%
+        addPolylines(data = df_polyline_yellowline, lat = ~lat, lng = ~lon, color = "yellow") %>%
+        addPolylines(data = df_polyline_greenline, lat = ~lat, lng = ~lon, color = "green") %>%
+        addPolylines(data = df_polyline_blueline, lat = ~lat, lng = ~lon, color = "blue")
+    } 
+    
+    else {
+      leafletProxy("map") %>% 
+        clearShapes()
+    }
+  })
+  
+  observe({
+    
+    if (input$centermap) {
+      leafletProxy("map") %>% 
+        setView(lng = -93.2, lat = 44.95, zoom = 11) 
+    }
+  })
+  
+}
+
+shinyApp(ui, server)
+```
