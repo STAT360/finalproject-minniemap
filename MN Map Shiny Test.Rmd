@@ -3,10 +3,6 @@ title: "MN Map Shiny TEST"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 Load libraries used in the app and the other code. The app uses the shinydashboard package rather than regular shiny - it has a cleaner default look and it's easier to customize the layout. 
 
 ```{r}
@@ -25,6 +21,9 @@ Functionality-wise, the only functional control widgets are the 'show existing m
 **It is a little slow and clunky for the app to start up. This is because the code that it runs beforehand takes a minute. I wanted to use what we had so far to make sure the reactivity in the leaflet would work how I wanted it to.
 
 ```{r}
+
+source("ryanscheck.R")
+
 key <- "AIzaSyDea9BHdMYeXvLUjJObACk2Ox8ofse2m68"
 
 green_line <- google_directions(origin = "Union Depot Station, Minnesota",
@@ -95,22 +94,33 @@ ui <- dashboardPage(
       
       column(width = 9,
              
-             tags$style(type = "text/css", "#map {height: calc(100vh - 80px) !important;},"),
+             tags$style(type = "text/css", '#map {height: calc(100vh - 80px) !important;},'),
              leafletOutput("map")),
       
       column(width = 3,
              
+             tags$head(tags$style(type='text/css', '#search_submit {color: rgba(58,128,167);}')),
+             tags$head(tags$style(type='text/css', '#locations {color: rgba(58,128,167);}')),
+             
              titlePanel(span("Create a map", br())),
              helpText("Choose a category and search for locations. This search uses Google Maps."),
              textInput("text", "Type your selection:"),
-             actionButton("submittext", label = "Search"),
-             helpText(br(),"Set the number of central transit hubs. This will change where routes join
-                      together."),
+             actionButton("search", label = "Search"),
+             
+             helpText(br(),"Set the number of central transit hubs. This will change
+                      where routes join together."),
              selectInput("hubs", "Number of hubs:", choices = c(1,2,3,4)),
+             
              helpText("Set the number of different routes."),
              sliderInput("routes", "Number of routes:", min = 3, max = 10, value = 3),
+             
              checkboxInput("mtroutes", "Show existing Metro Transit routes", FALSE),
-             actionButton("centermap", "Recenter map"))
+             
+             actionButton("centermap", "Recenter map"),
+             
+             textOutput("search_submit"),
+             textOutput("locations")
+      )
       
    )
  ),
@@ -125,27 +135,49 @@ server <- function(input, output) {
   "What if all bus stops in the Twin Cities area were at McDonald's? Gas stations?
   
   Build a transit map for the Twin Cities area by choosing what locations to use for the stops. Customize the map by changing the number of central transit hubs and the number of routes.")
+  
   output$map <- renderLeaflet({
     leaflet() %>% 
       addTiles() %>%
       setView(lng = -93.2696761, lat = 44.97566, zoom = 11.45) 
   })
+  
+  output$search_submit <- renderText({
+    input$search
+    paste("Search input:", isolate(input$text))
+    })
+  
+  output$locations <- renderText({
+    input$search
+    paste("Locations found:")
+    })
+
+  
   selectedPoints <- reactive({
     #finalized google search and data extraction of long & lat values
   })
   
   observe({
+    
     if (input$mtroutes) {
-      leafletProxy("map") %>% 
+      leafletProxy("map") %>%
         addTiles() %>%
-        addPolylines(data = greenline, lat = ~lat, lng = ~lon, color = "black", layerId = "greenline") %>%
-        addPolylines(data = blueline, lat = ~lat, lng = ~lon, color = "black", layerId = "blueline") %>% 
-        addPolylines(data = aline, lat = ~lat, lng = ~lon, color = "black", layerId = "aline") %>% 
-        addPolylines(data = redline, lat = ~lat, lng = ~lon, color = "black", layerId = "redline") %>% 
-        addPolylines(data = route5, lat = ~lat, lng = ~lon, color = "black", layerId = "route5") %>% 
-        addPolylines(data = route21, lat = ~lat, lng = ~lon, color = "black", layerId = "route21") %>% 
-        addPolylines(data = route18, lat = ~lat, lng = ~lon, color = "black", layerId = "route18") %>% 
-        addPolylines(data = route6, lat = ~lat, lng = ~lon, color = "black", layerId = "route6")
+        addPolylines(data = greenline, lat = ~lat, lng = ~lon, color = "black",
+                     layerId = "greenline") %>%
+        addPolylines(data = blueline, lat = ~lat, lng = ~lon, color = "black",
+                     layerId = "blueline") %>% 
+        addPolylines(data = aline, lat = ~lat, lng = ~lon, color = "black",
+                     layerId = "aline") %>% 
+        addPolylines(data = redline, lat = ~lat, lng = ~lon, color = "black",
+                     layerId = "redline") %>% 
+        addPolylines(data = route5, lat = ~lat, lng = ~lon, color = "black",
+                     layerId = "route5") %>% 
+        addPolylines(data = route21, lat = ~lat, lng = ~lon, color = "black",
+                     layerId = "route21") %>% 
+        addPolylines(data = route18, lat = ~lat, lng = ~lon, color = "black",
+                     layerId = "route18") %>% 
+        addPolylines(data = route6, lat = ~lat, lng = ~lon, color = "black",
+                     layerId = "route6")
     } 
     else {
       proxy <- leafletProxy("map")
