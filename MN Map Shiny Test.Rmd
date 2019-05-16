@@ -22,59 +22,17 @@ Functionality-wise, the only functional control widgets are the 'show existing m
 
 ```{r}
 
-source("ryanscheck.R")
+source("plot_locations.R")
 
-key <- "AIzaSyDea9BHdMYeXvLUjJObACk2Ox8ofse2m68"
-
-green_line <- google_directions(origin = "Union Depot Station, Minnesota",
-                              destination = "Target Field Station, Minnesota",
-                              key = key,
-                              mode = 'transit')
-
-blue_line <- google_directions(origin = "Target Field Station, Minnesota",
-                              destination = "Mall of America Station, Minnesota",
-                              key = key,
-                              mode = 'transit')
-
-a_line <- google_directions(origin = "Rosedale Transit Center, Minnesota",
-                              destination = "46th St Station, Minnesota",
-                              key = key,
-                              mode = 'transit')
-
-red_line <- google_directions(origin = "Mall of America Center, Minnesota",
-                              destination = "Apple Valley Transit Station, Minnesota",
-                              key = key,
-                              mode = 'transit')
-
-route_5 <- google_directions(origin = "Brooklyn Center Transit, Minnesota",
-                             destination = "Mall of America Transit Station, Minnesota",
-                             key = key,
-                             mode = 'transit')
-
-route_21 <- google_directions(origin = "Uptown Transit Station, Minnesota",
-                             destination = "Snelling Ave Station, Minnesota",
-                             key = key,
-                             mode = 'transit')
-
-route_18 <- google_directions(origin = "4th Ave S - 3rd St S, Minneapolis, MN 55415",
-                             destination = "9830 Aldrich Ave S, Bloomington, MN 55420",
-                             key = key,
-                             mode = 'transit')
-
-route_6 <- google_directions(origin = "Stadium Village Station, Minnesota",
-                             destination = "Southdale Transit Center, Minnesota",
-                             key = key,
-                             mode = 'transit')
-
-greenline <- decode_pl(green_line$routes$overview_polyline$points)
-blueline <- decode_pl(blue_line$routes$overview_polyline$points)
-aline <- decode_pl(a_line$routes$overview_polyline$points)
-redline <- decode_pl(red_line$routes$overview_polyline$points)
-route5 <- decode_pl(route_5$routes$overview_polyline$points)
-route21 <- decode_pl(route_21$routes$overview_polyline$points)
-route18 <- decode_pl(route_18$routes$overview_polyline$points)
-route6 <- decode_pl(route_6$routes$overview_polyline$points)
-
+greenline <- read.csv("greenline.csv")
+blueline <- read.csv("blueline.csv")
+nsline <- read.csv("nsline.csv")
+aline <- read.csv("aline.csv")
+redline <- read.csv("redline.csv")
+route5 <- read.csv("route5.csv")
+route21 <- read.csv("route21.csv")
+route18 <- read.csv("route18.csv")
+route6 <- read.csv("route6.csv")
 
 ui <- dashboardPage(
   
@@ -117,7 +75,9 @@ ui <- dashboardPage(
              checkboxInput("mtroutes", "Show existing Metro Transit routes", FALSE),
              
              actionButton("centermap", "Recenter map"),
+             actionButton("clearmap", label = "Clear map"),
              
+             helpText(br()),
              textOutput("search_submit"),
              textOutput("locations")
       )
@@ -141,20 +101,27 @@ server <- function(input, output) {
       addTiles() %>%
       setView(lng = -93.2696761, lat = 44.97566, zoom = 11.45) 
   })
-  
-  output$search_submit <- renderText({
+
+  observeEvent(input$search, {
+      
+      location_points <- NULL
+      location_points <- search_locations(user_location = input$text)
+      number_locations <- nrow(location_points)
+      
+      leafletProxy("map") %>%
+        addTiles() %>%
+        clearGroup(group = "location_points") %>%
+        addCircles(data = location_points, lat = ~lat, lng = ~lng-90, radius = 5, color = "blue", group = "location_points")
+     
+        output$search_submit <- renderText({
     input$search
-    paste("Search input:", isolate(input$text))
+    paste0("Search input:", isolate(input$text))
     })
   
   output$locations <- renderText({
     input$search
-    paste("Locations found:")
+    paste0("Locations found:", isolate(number_locations))
     })
-
-  
-  selectedPoints <- reactive({
-    #finalized google search and data extraction of long & lat values
   })
   
   observe({
@@ -166,6 +133,8 @@ server <- function(input, output) {
                      layerId = "greenline") %>%
         addPolylines(data = blueline, lat = ~lat, lng = ~lon, color = "black",
                      layerId = "blueline") %>% 
+        addPolylines(data = nsline, lat = ~lat, lng = ~lon, color = "black",
+                     layerId = "nsline") %>% 
         addPolylines(data = aline, lat = ~lat, lng = ~lon, color = "black",
                      layerId = "aline") %>% 
         addPolylines(data = redline, lat = ~lat, lng = ~lon, color = "black",
@@ -182,7 +151,8 @@ server <- function(input, output) {
     else {
       proxy <- leafletProxy("map")
       removeShape(proxy, layerId = "greenline")
-      removeShape(proxy, layerId = "blueline") 
+      removeShape(proxy, layerId = "blueline")
+      removeShape(proxy, layerId = "nsline")
       removeShape(proxy, layerId = "aline")
       removeShape(proxy, layerId = "redline")
       removeShape(proxy, layerId = "route5")
@@ -199,6 +169,13 @@ server <- function(input, output) {
     }
   })
   
+  observe({
+    if (input$clearmap) {
+      leafletProxy("map") %>% 
+        clearGroup(group = "location_points")
+      }
+  })
+  
 }
 
 shinyApp(ui, server)
@@ -206,3 +183,97 @@ shinyApp(ui, server)
 
 git config --global user.email "nels6906@stthomas.edu"
 git config --global user.name "Ryan Nelson"
+
+```{r}
+  observe({
+    if (input$submittext){
+      shinyalert(title = "Loading", timer = 5000, showConfirmButton = FALSE, imageUrl =
+                 "https://media1.tenor.com/images/cb27704982766b4f02691ea975d9a259/tenor.gif?itemid=11365139",
+                 imageWidth = 300, imageHeight = 300, animation = TRUE)
+    }
+  })
+```
+
+```{r}
+location_points <- search_locations(user_location = "mcdonalds")
+number_location <- nrow(location_coords)
+
+testmap <-
+  leaflet(location_points) %>% 
+  addTiles %>% 
+  addCircles(lat = ~lat, lng = ~lng-90, radius = 5, color = "blue", group = "location_points")
+
+testmap
+
+testmap %>% 
+  clearGroup(group = "location_points")
+```
+
+```{r}
+key <- "AIzaSyDea9BHdMYeXvLUjJObACk2Ox8ofse2m68"
+
+green_line <- google_directions(origin = "Union Depot Station, Minnesota",
+                              destination = "Target Field Station, Minnesota",
+                              key = key,
+                              mode = 'transit',
+                              traffic_model = 'optimistic')
+
+blue_line <- google_directions(origin = "Target Field Station, Minnesota",
+                              destination = "Mall of America Station, Minnesota",
+                              key = key,
+                              mode = 'transit',
+                              traffic_model = 'optimistic')
+
+northstar <- google_directions(origin = "Fridley Station, Minnesota",
+                               destination = "Target Field Station, Minnesota",
+                               key = key,
+                               mode = 'transit',
+                               traffic_model = 'optimistic')
+
+a_line <- google_directions(origin = "Rosedale Transit Center, Minnesota",
+                              destination = "46th St Station, Minnesota",
+                              key = key,
+                              mode = 'transit',
+                              traffic_model = 'optimistic')
+
+red_line <- google_directions(origin = "Mall of America Center, Minnesota",
+                              destination = "Apple Valley Transit Station, Minnesota",
+                              key = key,
+                              mode = 'transit',
+                              traffic_model = 'optimistic')
+
+route_5 <- google_directions(origin = "Brooklyn Center Transit, Minnesota",
+                             destination = "Mall of America Transit Station, Minnesota",
+                             key = key,
+                             mode = 'transit',
+                             traffic_model = 'optimistic')
+
+route_21 <- google_directions(origin = "Uptown Transit Station, Minnesota",
+                             destination = "Snelling Ave Station, Minnesota",
+                             key = key,
+                             mode = 'transit',
+                             traffic_model = 'optimistic')
+
+route_18 <- google_directions(origin = "4th Ave S - 3rd St S, Minneapolis, MN 55415",
+                             destination = "9830 Aldrich Ave S, Bloomington, MN 55420",
+                             key = key,
+                             mode = 'transit',
+                             traffic_model = 'optimistic')
+
+route_6 <- google_directions(origin = "Stadium Village Station, Minnesota",
+                             destination = "Southdale Transit Center, Minnesota",
+                             key = key,
+                             mode = 'transit',
+                             traffic_model = 'optimistic')
+
+greenline <- decode_pl(green_line$routes$overview_polyline$points)
+blueline <- decode_pl(blue_line$routes$overview_polyline$points)
+nsline <- decode_pl(northstar$routes$overview_polyline$points)
+aline <- decode_pl(a_line$routes$overview_polyline$points)
+redline <- decode_pl(red_line$routes$overview_polyline$points)
+route5 <- decode_pl(route_5$routes$overview_polyline$points)
+route21 <- decode_pl(route_21$routes$overview_polyline$points)
+route18 <- decode_pl(route_18$routes$overview_polyline$points)
+route6 <- decode_pl(route_6$routes$overview_polyline$points)
+```
+
