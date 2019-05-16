@@ -12,6 +12,8 @@ library(shinyalert)
 library(leaflet)
 library(googleway)
 library(tidyr)
+library(tidyverse)
+library(geosphere)
 ```
 
 The first draft of the app. The layout and overall appearance I think is pretty close to the final version. It will need adjustments when the rest of the code is finalized.
@@ -34,9 +36,11 @@ route21 <- read.csv("route21.csv")
 route18 <- read.csv("route18.csv")
 route6 <- read.csv("route6.csv")
 
+span <- shiny::span
+
 ui <- dashboardPage(
   
-  dashboardHeader(title = span("Minnie Map",
+  dashboardHeader(title = span("Minnie Map", 
                                style = "
                                     font-family: 'Avenir Next' !important; 
                                     font-weight: bold;
