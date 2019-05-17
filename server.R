@@ -66,13 +66,19 @@ Build a transit map for the Twin Cities area by choosing what locations will det
   #routes. If location_points is NULL, do nothing.
   observeEvent(input$buildroutes,{
     
-    shinyalert(title = "Loading", 
-               showConfirmButton = FALSE, 
-               imageUrl = "https://israelinstitute.nz/wp-content/uploads/2018/01/loader.gif")
-    
     if(is.null(location_points)){
+      
+      shinyalert("Error", 
+                 "Please search for locations",
+                 type = "error")
+      Sys.sleep(3)
     }
     else{
+      
+      shinyalert(title = "Loading", 
+                 showConfirmButton = FALSE, 
+                 imageUrl = "https://israelinstitute.nz/wp-content/uploads/2018/01/loader.gif")
+      
       proxy <- leafletProxy("map") %>% 
         clearGroup(group = "user_routes")
       
@@ -136,6 +142,7 @@ Build a transit map for the Twin Cities area by choosing what locations will det
         clearGroup(group = "location_points") %>% 
         clearGroup(group = "user_routes")
     }
+    
     location_points <<- NULL
     hide(id = "searched_for")
     hide(id = "locations_found")
