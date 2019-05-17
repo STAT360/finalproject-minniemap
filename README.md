@@ -1,5 +1,10 @@
 # finalproject
 
+Find the app here:
+
+https://nels6906.shinyapps.io/minnie_map_app/
+
+
 Please write your initial proposal for your final project in this README document. What type of project is it? 
 
 - Package?
