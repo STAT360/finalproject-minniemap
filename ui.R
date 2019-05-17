@@ -61,7 +61,7 @@ body <- dashboardBody(useShinyalert(),
                                   
                                   column(width = 6,
                                          
-                                         titlePanel("About"),
+                                         h1("About", id = "abouttitle"),
                                          br(),
                                          helpText("The planning of public transport takes into account 
                                 many different factors. We thought the way different 
