@@ -69,9 +69,8 @@ Build a transit map for the Twin Cities area by choosing what locations will det
     if(is.null(location_points)){
       
       shinyalert("Error", 
-                 "Please search for locations",
+                 "Locations are required to build routes",
                  type = "error")
-      Sys.sleep(3)
     }
     else{
       
@@ -94,8 +93,9 @@ Build a transit map for the Twin Cities area by choosing what locations will det
                               fillOpacity = .99, 
                               group = "user_routes")
       }
+      
+      closeAlert()
     }
-    closeAlert()
   })
   
   #When user checks or unchecks checkbox 'Show existing Metro Transit routes' make incremental
