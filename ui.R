@@ -72,9 +72,9 @@ body <- dashboardBody(useShinyalert(),
                                          br(),
                                          helpText("The app takes your search submission and identifies up
                                 to 60 locations from the center of Minneapolis/St Paul in a
-                                radius of about 6 miles. Search results are found using Google
+                                radius of about 10 miles. Search results are found using Google
                                 Maps API. The system must pause in between Google Maps search
-                                result pages, resulting in a loading time of about 12 seconds. 
+                                result pages, resulting in a loading time of about 10 to 12 seconds. 
                                 Routes are built by calculating cluster centers among location 
                                 coordinates. The number of routes is actually the number of 
                                 clusters the route-finding algorithm takes as input."),
