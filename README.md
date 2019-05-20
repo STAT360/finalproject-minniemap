@@ -1,6 +1,6 @@
 # STAT 360 Group Project 
 ### Ryan Nelson, Peter Roessler-Caram, Michael Schatzel, Jimmy Kroll, and Trevor Tracy
-### STAT 360 | Professor Amelia MacNamara
+### STAT 360 | Professor Amelia McNamara
 ### 21 May 2019
 
  https://nels6906.shinyapps.io/minnie_map_app/
