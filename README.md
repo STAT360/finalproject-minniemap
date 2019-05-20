@@ -1,11 +1,11 @@
 # STAT 360 Group Project 
-
-## Ryan Nelson, Peter Roessler-Caram, Michael Schatzel, Jimmy Kroll, and Trevor Tracy
+### Ryan Nelson, Peter Roessler-Caram, Michael Schatzel, Jimmy Kroll, and Trevor Tracy
 ### STAT 360 | Professor Amelia MacNamara
 ### 21 May 2019
 
-## Link to App
-### https://nels6906.shinyapps.io/minnie_map_app/
+### Link to App
+ https://nels6906.shinyapps.io/minnie_map_app/
+
 
 # Documentation
 
@@ -35,11 +35,12 @@ Each route between the starting central hub and the end point follows the fastes
 
 The "Minnie Map" Shiny app is simple and very user friendly. When a user first launches the app, a transportation grid of the Twin Cities Metro Area appears provided by the leaflet R package. The following steps allow the user to operate the Minnie Map:
 ### 1. Enter a search location or location phrase and click Search
-    This step populates the app with the location data and shows the up to 60 searched data points on the map. Once the search button is     pressed, a loading bar appears for 10-12 seconds as the Google Maps API is used.
+    This step populates the app with the location data and shows the up to 60 searched data points on the map.
+    Once the search button is pressed, a loading bar appears for 10-12 seconds as the Google Maps API is used.
 ### 2. Use the slider to set how many transit routes to build and click Build Routes
-    This step uses the K-Means clustering algorithm to determine the routes and colors each route a different color. Parts where
-    multiple routes overlap, or where a roadway is shared by multiple routes, is shown as a different color until the individual routes
-    split away. This is commmon near the starting central hub.
+    This step uses the K-Means clustering algorithm to determine the routes and colors each route a different color.
+    Parts where multiple routes overlap, or where a roadway is shared by multiple routes, is shown as a different color
+    until the individual routes split away. This is commmon near the starting central hub.
 ### 3. The user can also toggle to show the current Metro Transit routes on the map for comparitive purposes. 
     This routes are shown as black, dashed lines.
 ### 4. To reset the map, users can click Recenter Map and Clear Map to view a clean map
