@@ -40,6 +40,8 @@ search_locations <- function(user_location) {
   filtered_points <- clean_data %>% 
     filter(!distm(origin, clean_data[,], fun = distHaversine)>rad)
   
+  filtered_points <- distinct(filtered_points)
+  
   return(filtered_points)
 }
 
