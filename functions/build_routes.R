@@ -6,6 +6,11 @@ build_routes <- function(location_coords, num_routes){
   #Take input from user generated 'location_points' (input here as location_coords)
   filtered_coords_90 <- cbind(lat = location_coords[,1], lng = location_coords[,2]-90)
   
+  if (nrow(filtered_coords_90) <= num_routes) {
+    return("error")
+  }
+  
+  else {
   #Create sub-clusters
   sub_clust <- kmeans(filtered_coords_90, centers = num_routes)
   
@@ -28,4 +33,5 @@ build_routes <- function(location_coords, num_routes){
   }
   
   return(df_polyline)
+  }
 }

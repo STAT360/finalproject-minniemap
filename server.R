@@ -26,7 +26,7 @@ Build a transit map for the Twin Cities area by choosing what locations will det
     hide(id = "locations_found")
     
     location_points <<- search_locations(user_location = input$text)
-    number_locations <- nrow(location_points)
+    number_locations <<- nrow(location_points)
     
     leafletProxy("map") %>%
       addTiles() %>%
@@ -83,6 +83,13 @@ Build a transit map for the Twin Cities area by choosing what locations will det
       
       user_routes <- build_routes(location_points, input$routes)
       
+      if(user_routes == "error") {
+        shinyalert("Error", 
+                   "Number of routes must be less than the number of locations found",
+                   type = "error")
+      }
+      else {
+      
       for(i in 1:input$routes){
         proxy <- addPolylines(proxy, 
                               data = user_routes[[i]], 
@@ -95,6 +102,7 @@ Build a transit map for the Twin Cities area by choosing what locations will det
       }
       
       closeAlert()
+      }
     }
   })
   
