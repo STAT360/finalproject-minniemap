@@ -31,8 +31,8 @@ Build a transit map for the Twin Cities area by choosing what locations will det
     if(!number_locations){
       shinyalert(title = "No Locations Found", 
                  showConfirmButton = TRUE,
-                 text = "Please check your spelling or try another search."
-                 
+                 text = "Please check your spelling or try another search",
+                 type = "error"
                  )
       output$searched_for <- renderText({
         input$search
