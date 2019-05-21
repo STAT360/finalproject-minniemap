@@ -112,9 +112,9 @@ Build a transit map for the Twin Cities area by choosing what locations will det
       
       user_routes <- build_routes(location_points, input$routes)
       
-      if(user_routes == "error") {
+      if(is.character(user_routes)) {
         shinyalert("Error", 
-                   "Number of routes must be less than the number of locations found",
+                   "Number of routes cannot exceed the number of locations found",
                    type = "error")
       }
       else {
