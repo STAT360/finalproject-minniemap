@@ -26,7 +26,7 @@ Build a transit map for the Twin Cities area by choosing what locations will det
     hide(id = "locations_found")
     
     location_points <<- search_locations(user_location = input$text)
-    number_locations <<- nrow(location_points)
+    number_locations <- nrow(location_points)
     
     if(!number_locations){
       shinyalert(title = "No Locations Found", 
@@ -34,6 +34,12 @@ Build a transit map for the Twin Cities area by choosing what locations will det
                  text = "Please check your spelling or try another search",
                  type = "error"
                  )
+      
+      leafletProxy("map") %>%
+        addTiles() %>%
+        clearGroup(group = "location_points") %>%
+        clearGroup(group = "user_routes")
+      
       output$searched_for <- renderText({
         input$search
         paste0("Searched for: ", isolate(input$text))
@@ -46,6 +52,8 @@ Build a transit map for the Twin Cities area by choosing what locations will det
       
       show("searched_for")
       show("locations_found")
+      
+      location_points <<- NULL
     }
     else{
       leafletProxy("map") %>%
