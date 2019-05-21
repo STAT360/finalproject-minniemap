@@ -30,7 +30,11 @@ search_locations <- function(user_location) {
   
   ##Clean coordinates to prepare for plotting
   clean_data<-filtered_data
-  clean_data[,2]<-clean_data[,2]+90
+  
+  ##Check to see if results are > 0
+  if(nrow(clean_data)){
+    clean_data[,2]<-clean_data[,2]+90
+  }
   
   ##Adjust longitude set, reset radius and origin
   rad <- 16100
