@@ -1,0 +1,63 @@
+---
+title: "Minnie Map"
+author: Ryan Nelson, Peter Roessler-Caram, Michael Schatzel, Jimmy Kroll, and Trevor Tracy
+date: "5/21/2019"
+output: ioslides_presentation
+---
+
+## Motivation {data-background="Chicago_Culvers.png"}
+
+
+## Packages
+
+- Tidyverse
+- leaflet
+- googleway
+- geosphere
+- Shiny
+
+
+## Data Collection
+
+- Google Maps API
+- Up to 60 locations within 10 mile radius
+
+![](Map_View.png)
+
+## Mapping
+
+- Routes created using K-means clustering
+- Follow roadways, real-time traffic conditions
+
+
+## Points: Starbucks
+
+![](Points.PNG)
+
+
+## Cluster Centers: Endpoints
+
+![](Centers.PNG)
+
+
+## Main Center: Starting Point
+
+![](Center.PNG)
+
+
+# App
+
+https://nels6906.shinyapps.io/minnie_map_app/
+
+
+## Questions {data-background="IJLSA.png" data-image-size=cover}
+
+
+
+
+
+
+
+
+
+
