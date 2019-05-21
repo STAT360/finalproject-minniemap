@@ -55,4 +55,7 @@ custom_css <- "
 #locations_found {
   color: rgba(58,128,167);
 }
+.irs-grid-pol.small {
+  height: 0px;
+}
 "
