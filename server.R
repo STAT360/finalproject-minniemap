@@ -28,7 +28,27 @@ Build a transit map for the Twin Cities area by choosing what locations will det
     location_points <<- search_locations(user_location = input$text)
     number_locations <<- nrow(location_points)
     
-    leafletProxy("map") %>%
+    if(!number_locations){
+      shinyalert(title = "No Locations Found", 
+                 showConfirmButton = TRUE,
+                 text = "Please check your spelling or try another search."
+                 
+                 )
+      output$searched_for <- renderText({
+        input$search
+        paste0("Searched for: ", isolate(input$text))
+      })
+      
+      output$locations_found <- renderText({
+        input$search
+        paste0("Locations found: ", isolate(number_locations))
+      })
+      
+      show("searched_for")
+      show("locations_found")
+    }
+    else{
+      leafletProxy("map") %>%
       addTiles() %>%
       clearGroup(group = "location_points") %>%
       clearGroup(group = "user_routes") %>% 
@@ -42,22 +62,23 @@ Build a transit map for the Twin Cities area by choosing what locations will det
                        fillColor = "darkblue", 
                        fillOpacity = 1, 
                        group = "location_points")
-    
-    output$searched_for <- renderText({
       
-      input$search
-      paste0("Searched for: ", isolate(input$text))
-    })
-    
-    output$locations_found <- renderText({
+      output$searched_for <- renderText({
+        input$search
+        paste0("Searched for: ", isolate(input$text))
+      })
       
-      input$search
-      paste0("Locations found: ", isolate(number_locations))
-    })
+      output$locations_found <- renderText({
+        input$search
+        paste0("Locations found: ", isolate(number_locations))
+      })
+      
+      show("searched_for")
+      show("locations_found")
+      closeAlert()
+    }
     
-    show("searched_for")
-    show("locations_found")
-    closeAlert()
+
   })
   
   #When the user clicks the 'Build Routes' button, run the 'build_routes' function. It uses input
